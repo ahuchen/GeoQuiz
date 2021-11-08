@@ -1,5 +1,6 @@
 package com.icnexus.geoquiz;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.media.Image;
@@ -15,12 +16,13 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "Quiz-MainActivity";
+    private static final String TAG = "QuizMainActivity";
+    private static final String KEY_INDEX = "index";
+
     private TextView mTextView;
     private Button mTrueButton;
     private Button mFalseButton;
-    private ImageButton mNextButton;
-    private ImageButton mPrevButton;
+    private Button mNextButton;
 
     private TextView mQuestionTextView;
     private Question[] mQuestionsBank = new Question[]{
@@ -38,9 +40,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate(Budle) called.");
+        setContentView(R.layout.activity_main);
+
+        if(savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
         updateQuestion();
@@ -74,21 +79,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mNextButton = (ImageButton) findViewById(R.id.next_button);
+        mNextButton = (Button) findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionsBank.length;
                 updateQuestion();
-            }
-        });
-        mPrevButton = (ImageButton) findViewById(R.id.prev_button);
-        mPrevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCurrentIndex = (mCurrentIndex - 1) % mQuestionsBank.length;
-                updateQuestion();
-
             }
         });
     }
@@ -108,6 +104,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() called.");
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle saveddInstanecState) {
+        super.onSaveInstanceState(saveddInstanecState);
+        Log.d(TAG, "onSaveInstanceState() called.");
+        saveddInstanecState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
     @Override
